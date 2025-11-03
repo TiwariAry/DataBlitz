@@ -6,11 +6,9 @@ import {
     SelectContent,
     SelectGroup,
     SelectItem,
-    SelectLabel,
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
-import {handlePagesErrorRoute} from "next/dist/server/dev/turbopack-utils";
 
 const SelectField = ({ name, label, placeholder, options, control, error, required=false } : SelectFieldProps) => {
     return (

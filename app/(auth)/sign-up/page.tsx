@@ -7,8 +7,13 @@ import SelectField from "@/components/forms/SelectField";
 import {INVESTMENT_GOALS, PREFERRED_INDUSTRIES, RISK_TOLERANCE_OPTIONS} from "@/lib/constants";
 import {CountrySelectField} from "@/components/forms/CountrySelectField";
 import FooterLink from "@/components/forms/FooterLink";
+import {signUpWithEmail} from "@/lib/actions/auth-actions";
+import {useRouter} from "next/navigation";
+import {toast} from "sonner";
 
-const SignUp = () => {
+export default function SignUp() {
+    const router = useRouter();
+
     const {
         register,
         handleSubmit,
@@ -28,12 +33,31 @@ const SignUp = () => {
     })
 
     const onSubmit = async (data : SignUpFormData) => {
+
         try {
-            console.log(data)
+            console.log("Calling signUpWithEmail...")
+            const result = await signUpWithEmail(data);
+            console.log("Result received:", result)
+
+            if (result?.success) {
+                console.log("Sign up successful! Redirecting...")
+                toast.success('Account created successfully!')
+                router.push('/')
+                router.refresh()
+            } else {
+                console.log("Sign up failed with error:", result?.error)
+                toast.error('Sign up failed', {
+                    description: result?.error || 'Failed to create an account',
+                })
+            }
         }
         catch (error) {
-            console.log(error)
+            toast.error('Sign up failed', {
+                description: error instanceof Error ? error.message : 'An unexpected error occurred',
+            })
         }
+
+        console.log("=== FORM SUBMIT ENDED ===")
     }
 
     return (
@@ -47,7 +71,10 @@ const SignUp = () => {
                     placeholder={"Sahil Raj"}
                     register={register}
                     error={errors.fullName}
-                    validation={{ required: 'Full name is required', minLength: 2 }}
+                    validation={{
+                        required: 'Full name is required',
+                        minLength: { value: 2, message: 'Name must be at least 2 characters' }
+                    }}
                 />
                 <InputField
                     name={"email"}
@@ -55,7 +82,13 @@ const SignUp = () => {
                     placeholder={"sahilraj@gmail.com"}
                     register={register}
                     error={errors.email}
-                    validation={{ required: 'Email is required', pattern: /^w+@\w+\.\w+$/, message: 'Email is required' }}
+                    validation={{
+                        required: 'Email is required',
+                        pattern: {
+                            value: /^\w+@\w+\.\w+$/,
+                            message: 'Please enter a valid email'
+                        }
+                    }}
                 />
                 <InputField
                     name={"password"}
@@ -64,7 +97,10 @@ const SignUp = () => {
                     type={'password'}
                     register={register}
                     error={errors.password}
-                    validation={{ required: 'Password is required', minLength: 8 }}
+                    validation={{
+                        required: 'Password is required',
+                        minLength: { value: 8, message: 'Password must be at least 8 characters' }
+                    }}
                 />
 
                 <CountrySelectField
@@ -104,7 +140,7 @@ const SignUp = () => {
                 />
 
                 <button type={"submit"} disabled={isSubmitting} className={"yellow-btn w-full mt-5"}>
-                    {isSubmitting ? 'Creating account' : 'Start Your Investing Journey'}
+                    {isSubmitting ? 'Creating account...' : 'Start Your Investing Journey'}
                 </button>
 
                 <FooterLink
@@ -116,4 +152,3 @@ const SignUp = () => {
         </>
     )
 }
-export default SignUp
