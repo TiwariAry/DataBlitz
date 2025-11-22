@@ -27,7 +27,7 @@ export default function SignUp() {
             country: 'IN',
             investmentGoals: 'Growth',
             riskTolerance: 'Medium',
-            preferredIndustry: 'Retail'
+            preferredIndustry: 'Technology'
         },
         mode: 'onBlur'
     })
